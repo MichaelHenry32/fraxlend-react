@@ -1,18 +1,17 @@
-import { createRoot } from 'react-dom/client'
-import { Provider } from 'react-redux'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+import App from './App';
+import { system } from "@chakra-ui/react/preset";
+import { ChakraProvider } from '@chakra-ui/react';
 
-import App from './App'
-import { store } from './app/store'
-import React from 'react'
-
-// skip mock API setup
-
-const root = createRoot(document.getElementById('root')!)
-
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <ChakraProvider value={system}>
+        <App />
+      </ChakraProvider>
     </Provider>
   </React.StrictMode>
 )

@@ -1,24 +1,12 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import './App.css'
-import { FraxlendMarketsList } from './features/fraxlend/FraxlendMarketsList'
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes'; // Import your routes file
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <FraxlendMarketsList />
-              </>
-            }
-          ></Route>
-        </Routes>
-      </div>
-    </Router>
-  )
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
