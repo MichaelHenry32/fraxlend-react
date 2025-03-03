@@ -10,7 +10,14 @@ export interface FraxlendMarket {
     isSfrxUsdMarket: boolean
 }
 
+export interface FraxlendMarketDetails {
+    assetBalance: bigint,
+    fraxlendShareBalance: bigint
+}
+
 export interface FraxlendInterface {
-    markets: FraxlendMarket[],
+    markets: {
+        [pairAddress: `0x${string}`]: FraxlendMarket
+    },
     status: "idle" | "loading" | "succeeded" | "rejected"
 }

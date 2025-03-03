@@ -5,16 +5,16 @@ import { publicClient } from "../../app/client";
 import { calculatePercentage } from "../../utils/numberUtils";
 import { FraxlendMarket } from "./fraxlendInterfaces";
 
+
 // TODO: Replace this with an automatic fetcher.
 const PAIR_TO_HELPER_MAP: Record<`0x${string}`, `0x${string}`> = {
-    '0x689087338CFbD1D268AD361F7759Fb1200c921e2': '0x1090DDcFC8c4Fd73b81a3b7F1a9Cf490975eF497'
+    '0x689087338CFbD1D268AD361F7759Fb1200c921e2': '0xd7446c346f54F8F20164e5620CA810b172df2FEa'
 }
 
 function get_helper_address(pairAddress: `0x${string}`): `0x${string}` {
     return PAIR_TO_HELPER_MAP[pairAddress] || pairAddress;
 }
 
-// export async function getFraxlendMarket()
 
 // I want to see: Market, Collateral, Asset, Utilization, Total Borrow, APR
 export async function getFraxlendMarket(pairAddress: `0x${string}`): Promise<FraxlendMarket | undefined> {

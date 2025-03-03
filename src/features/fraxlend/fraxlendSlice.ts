@@ -11,7 +11,7 @@ export const fetchMarketsData = createAsyncThunk<FraxlendMarket[], void>(
 );
 
 const initialState: FraxlendInterface = {
-    markets: [],
+    markets: {},
     status: "idle"
 };
 
@@ -26,7 +26,7 @@ const fraxlendSlice = createSlice({
             })
             .addCase(fetchMarketsData.fulfilled, (state, action) => {
                 state.status = "succeeded"
-                state.markets = action.payload;
+                state.markets = Object.fromEntries(action.payload.map(market => [market.pairAddress, market]));
             }).addCase(fetchMarketsData.rejected, (state, action) => {
                 state.status = "rejected";
                 console.log("Fetch markets failed: ", action)
