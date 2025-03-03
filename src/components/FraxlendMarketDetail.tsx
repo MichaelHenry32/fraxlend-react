@@ -15,13 +15,19 @@ import {
     Button
 } from '@mui/material';
 import { fetchMarketDetailData } from '../features/fraxlend/fraxlendSlice';
+import { useAccount } from 'wagmi';
 
 // Define the type for your route parameters
 
 const FraxlendMarketDetail = () => {
     const [inputValue, setInputValue] = useState('');
     const dispatch = useAppDispatch();
-    const user_address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" as `0x${string}`;
+    const { address, isConnected } = useAccount();
+    if (!address) {
+        address = "0x0000000000000000000000000000000000000000";
+    }
+
+    const userAddress = address ? address : "0x0000000000000000000000000000000000000000";
     // Use the type with useParams
     const { pairAddress } = useParams() as { pairAddress: `0x${string}` };
 
@@ -32,19 +38,25 @@ const FraxlendMarketDetail = () => {
 
     useEffect(() => {
         if (!marketDetails) {
-            dispatch(fetchMarketDetailData({ fraxlendMarket: market, user_address }));
+            dispatch(fetchMarketDetailData({ fraxlendMarket: market, userAddress }));
             return;
         }
 
-        if (marketDetails.status === 'idle' || marketDetails.user_address !== user_address) {
-            dispatch(fetchMarketDetailData({ fraxlendMarket: market, user_address: user_address }))
+        if (marketDetails.status === 'idle' || marketDetails.user_address !== address) {
+            dispatch(fetchMarketDetailData({ fraxlendMarket: market, userAddress }))
         }
-    }, [dispatch, market, user_address, marketDetails]);
+    }, [dispatch, market, userAddress, marketDetails]);
 
     if (market === undefined || marketDetails === undefined) {
         return (
-            <></>
+            <Typography variant="body1">
+                <strong>Please connect wallet</strong>
+            </Typography>
         )
+    }
+
+    if (!isConnected) {
+        return <></>
     }
 
     console.log("Market Details: ", marketDetails);

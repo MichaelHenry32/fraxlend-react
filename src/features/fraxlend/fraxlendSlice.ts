@@ -12,8 +12,8 @@ export const fetchMarketsData = createAsyncThunk<FraxlendMarket[], void>(
 
 export const fetchMarketDetailData = createAsyncThunk(
     "fraxlend/fetchMarketDetailData",
-    async (params: { fraxlendMarket: FraxlendMarket, user_address: `0x${string}` }) => {
-        const resp = await getFraxlendMarketDetails(params.fraxlendMarket, params.user_address);
+    async (params: { fraxlendMarket: FraxlendMarket, userAddress: `0x${string}` }) => {
+        const resp = await getFraxlendMarketDetails(params.fraxlendMarket, params.userAddress);
         return resp;
     }
 );
@@ -44,7 +44,7 @@ const fraxlendSlice = createSlice({
             .addCase(fetchMarketDetailData.pending, (state, action) => {
                 const pairAddress = action.meta.arg.fraxlendMarket.pairAddress;
                 if (!state.marketDetails[pairAddress]) {
-                    state.marketDetails[pairAddress] = { user_address: action.meta.arg.user_address, assetBalance: "0", sharesBalance: "0", status: "loading" };
+                    state.marketDetails[pairAddress] = { user_address: action.meta.arg.userAddress, assetBalance: "0", sharesBalance: "0", status: "loading" };
                 }
                 state.marketDetails[pairAddress].status = "loading";
             })
@@ -58,7 +58,7 @@ const fraxlendSlice = createSlice({
                 } else {
                     state.marketDetails[pairAddress] = {
                         ...action.payload,
-                        user_address: action.meta.arg.user_address,
+                        user_address: action.meta.arg.userAddress,
                         status: "succeeded"
                     }
                 }
