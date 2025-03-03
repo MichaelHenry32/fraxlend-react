@@ -1,9 +1,15 @@
+export interface ERC20Interface {
+    name: string,
+    symbol: string,
+    address: `0x${string}`
+}
+
 export interface FraxlendMarket {
     helperAddress: `0x${string}`,
     pairAddress: `0x${string}`,
     name: string,
-    asset: `0x${string}`,
-    collateral: `0x${string}`
+    asset: ERC20Interface,
+    collateral: ERC20Interface,
     lendApr: number,
     utilization: number,
     totalBorrow: number,
@@ -11,13 +17,18 @@ export interface FraxlendMarket {
 }
 
 export interface FraxlendMarketDetails {
-    assetBalance: bigint,
-    fraxlendShareBalance: bigint
+    user_address: `0x${string}`,
+    assetBalance: string,
+    sharesBalance: string,
+    status: "idle" | "loading" | "succeeded" | "rejected"
 }
 
 export interface FraxlendInterface {
     markets: {
         [pairAddress: `0x${string}`]: FraxlendMarket
+    },
+    marketDetails: {
+        [pairAddress: `0x${string}`]: FraxlendMarketDetails
     },
     status: "idle" | "loading" | "succeeded" | "rejected"
 }

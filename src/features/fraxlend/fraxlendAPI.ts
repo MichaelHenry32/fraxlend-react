@@ -4,6 +4,7 @@ import { FraxlendPairDeployerAbi } from "../../abis/Fraxlend/fraxlendPairDeploye
 import { publicClient } from "../../app/client";
 import { calculatePercentage } from "../../utils/numberUtils";
 import { FraxlendMarket } from "./fraxlendInterfaces";
+import { Erc20Abi } from "../../abis/erc20";
 
 
 // TODO: Replace this with an automatic fetcher.
@@ -13,6 +14,35 @@ const PAIR_TO_HELPER_MAP: Record<`0x${string}`, `0x${string}`> = {
 
 function get_helper_address(pairAddress: `0x${string}`): `0x${string}` {
     return PAIR_TO_HELPER_MAP[pairAddress] || pairAddress;
+}
+
+export async function getFraxlendMarketDetails(fraxlendMarket: FraxlendMarket, user_address: `0x${string}`): Promise<{ assetBalance: string; sharesBalance: string } | undefined> {
+    try {
+        const [assetBalance, sharesBalance] = await publicClient.multicall({
+            contracts: [
+                {
+                    address: fraxlendMarket.asset.address,
+                    abi: Erc20Abi,
+                    functionName: 'balanceOf',
+                    args: [user_address]
+                },
+                {
+                    address: fraxlendMarket.pairAddress,
+                    abi: Erc20Abi,
+                    functionName: 'balanceOf',
+                    args: [user_address]
+                }
+            ]
+        });
+
+        return {
+            assetBalance: assetBalance.result?.toString() || "0",
+            sharesBalance: sharesBalance.result?.toString() || "0"
+        };
+    } catch (e) {
+        console.error("Failed to get fraxlend market details", e)
+        return undefined;
+    }
 }
 
 
@@ -69,13 +99,48 @@ export async function getFraxlendMarket(pairAddress: `0x${string}`): Promise<Fra
         let lendApr = calculatePercentage(currentRateInfo[3] * BigInt(3153600000), BigInt(10 ** 20));
         lendApr = pairAddress != helperAddress ? lendApr : lendApr * utilization / 100
 
+        const assetCollateralInfo = await publicClient.multicall({
+            contracts: [
+                {
+                    address: assetAddress.result!,
+                    abi: Erc20Abi,
+                    functionName: 'name'
+                },
+                {
+                    address: assetAddress.result!,
+                    abi: Erc20Abi,
+                    functionName: 'symbol'
+                },
+                {
+                    address: collateralAddress.result!,
+                    abi: Erc20Abi,
+                    functionName: 'name'
+                },
+                {
+                    address: collateralAddress.result!,
+                    abi: Erc20Abi,
+                    functionName: 'symbol'
+                },
+            ]
+        });
+
+        const [assetName, assetSymbol, collateralName, collateralSymbol] = assetCollateralInfo;
+
+
         return {
             pairAddress: pairAddress,
             helperAddress: helperAddress,
             name: pairName.result!,
-            asset: assetAddress.result!,
-            collateral: collateralAddress.result!,
-            utilization: utilization,
+            asset: {
+                name: assetName.result!,
+                symbol: assetSymbol.result!,
+                address: assetAddress.result!
+            },
+            collateral: {
+                name: collateralName.result!,
+                symbol: collateralSymbol.result!,
+                address: collateralAddress.result!
+            }, utilization: utilization,
             lendApr: lendApr,
             totalBorrow: Number(formatUnits(pairAccounting[4] - pairAccounting[0], 18)),
             isSfrxUsdMarket: pairAddress != helperAddress

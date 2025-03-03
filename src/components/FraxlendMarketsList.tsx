@@ -46,8 +46,8 @@ export const FraxlendMarketsList = () => {
                         Object.values(markets).map(market =>
                             <TableRow key={market.pairAddress} onClick={() => handleMarketClick(market.pairAddress)} >
                                 <TableCell>{market.name}</TableCell>
-                                <TableCell>{market.asset}</TableCell>
-                                <TableCell>{market.collateral}</TableCell>
+                                <TableCell>{market.asset.name}</TableCell>
+                                <TableCell>{market.collateral.name}</TableCell>
                                 <TableCell>{market.lendApr}</TableCell>
                                 <TableCell>{market.totalBorrow}</TableCell>
                                 <TableCell>{market.utilization}</TableCell>

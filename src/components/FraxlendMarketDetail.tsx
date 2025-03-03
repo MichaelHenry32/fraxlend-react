@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../app/hooks';
-import { useState } from 'react';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { useEffect, useState } from 'react';
 import {
     Typography,
     Paper,
@@ -14,25 +14,40 @@ import {
     TextField,
     Button
 } from '@mui/material';
+import { fetchMarketDetailData } from '../features/fraxlend/fraxlendSlice';
 
 // Define the type for your route parameters
 
 const FraxlendMarketDetail = () => {
     const [inputValue, setInputValue] = useState('');
+    const dispatch = useAppDispatch();
+    const user_address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" as `0x${string}`;
     // Use the type with useParams
     const { pairAddress } = useParams() as { pairAddress: `0x${string}` };
 
     const market = useAppSelector(state => state.fraxlend.markets[pairAddress]);
+    const marketDetails = useAppSelector(state => state.fraxlend.marketDetails[pairAddress]);
 
-    if (market == undefined) {
+
+
+    useEffect(() => {
+        if (!marketDetails) {
+            dispatch(fetchMarketDetailData({ fraxlendMarket: market, user_address }));
+            return;
+        }
+
+        if (marketDetails.status === 'idle' || marketDetails.user_address !== user_address) {
+            dispatch(fetchMarketDetailData({ fraxlendMarket: market, user_address: user_address }))
+        }
+    }, [dispatch, market, user_address, marketDetails]);
+
+    if (market === undefined || marketDetails === undefined) {
         return (
-            <Paper sx={{ p: 3, mt: 2 }}>
-                <Typography variant="h5" color="error">
-                    Market not found
-                </Typography>
-            </Paper>
-        );
+            <></>
+        )
     }
+
+    console.log("Market Details: ", marketDetails);
 
     return (
         <Paper sx={{ p: 3, mt: 2 }}>
@@ -58,10 +73,10 @@ const FraxlendMarketDetail = () => {
                                     <strong>Helper Address:</strong> {market.helperAddress}
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>Asset:</strong> {market.asset}
+                                    <strong>Asset:</strong> {market.asset.name}
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>Collateral:</strong> {market.collateral}
+                                    <strong>Collateral:</strong> {market.collateral.name}
                                 </Typography>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Typography component="span">
@@ -133,11 +148,11 @@ const FraxlendMarketDetail = () => {
                                                     backgroundColor: 'rgba(25, 118, 210, 0.12)'
                                                 }
                                             }}
-                                            onClick={() => setInputValue('1000')} // Replace with actual max value logic
+                                            onClick={() => setInputValue(marketDetails.assetBalance)} // Replace with actual max value logic
                                         >
                                             MAX
                                         </Button>
-                                        <Typography variant="body2" color="textSecondary">frxUSD</Typography>
+                                        <Typography variant="body2" color="textSecondary">{market.asset.symbol}</Typography>
                                     </Box>
                                 )
                             }}
