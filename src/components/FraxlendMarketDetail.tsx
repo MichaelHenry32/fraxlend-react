@@ -23,9 +23,6 @@ const FraxlendMarketDetail = () => {
     const [inputValue, setInputValue] = useState('');
     const dispatch = useAppDispatch();
     const { address, isConnected } = useAccount();
-    if (!address) {
-        address = "0x0000000000000000000000000000000000000000";
-    }
 
     const userAddress = address ? address : "0x0000000000000000000000000000000000000000";
     // Use the type with useParams
