@@ -15,7 +15,11 @@ import {
     Button
 } from '@mui/material';
 import { fetchMarketDetailData } from '../features/fraxlend/fraxlendSlice';
-import { useAccount } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract } from 'wagmi';
+import { Erc20Abi } from '../abis/erc20';
+import { FraxlendPairAbi } from '../abis/Fraxlend/fraxlendPair';
+import { formatUnits } from "viem/utils";
+
 
 // Define the type for your route parameters
 
@@ -23,7 +27,7 @@ const FraxlendMarketDetail = () => {
     const [inputValue, setInputValue] = useState('');
     const dispatch = useAppDispatch();
     const { address, isConnected } = useAccount();
-
+    const { data: hash, isPending, writeContract } = useWriteContract();
     const userAddress = address ? address : "0x0000000000000000000000000000000000000000";
     // Use the type with useParams
     const { pairAddress } = useParams() as { pairAddress: `0x${string}` };
@@ -31,7 +35,18 @@ const FraxlendMarketDetail = () => {
     const market = useAppSelector(state => state.fraxlend.markets[pairAddress]);
     const marketDetails = useAppSelector(state => state.fraxlend.marketDetails[pairAddress]);
 
+    const { data: allowance, refetch } = useReadContract({
+        address: market.asset.address,
+        abi: Erc20Abi,
+        functionName: "allowance",
+        args: [userAddress, market.helperAddress],
+    });
 
+    // Convert input value to BigInt for comparison with allowance
+    const inputValueBigInt = inputValue ? BigInt(parseFloat(inputValue) * (10 ** 18)) : BigInt(0);
+    
+    // Check if allowance is sufficient for the input amount
+    const hasAllowance = allowance && inputValueBigInt > 0 ? BigInt(allowance.toString()) >= inputValueBigInt : false;
 
     useEffect(() => {
         if (!marketDetails) {
@@ -39,10 +54,16 @@ const FraxlendMarketDetail = () => {
             return;
         }
 
-        if (marketDetails.status === 'idle' || marketDetails.user_address !== address) {
+        if (marketDetails.status === 'idle' || marketDetails.user_address !== userAddress) {
             dispatch(fetchMarketDetailData({ fraxlendMarket: market, userAddress }))
         }
     }, [dispatch, market, userAddress, marketDetails]);
+
+    useEffect(() => {
+        if (hash) {
+            refetch()
+        }
+    }, [hash, isPending, refetch]);
 
     if (market === undefined || marketDetails === undefined) {
         return (
@@ -140,11 +161,13 @@ const FraxlendMarketDetail = () => {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder="Enter amount..."
+                            disabled={isPending}
                             InputProps={{
                                 endAdornment: (
                                     <Box display="flex" alignItems="center">
                                         <Button
                                             size="small"
+                                            disabled={isPending}
                                             sx={{
                                                 minWidth: 'auto',
                                                 fontSize: '0.7rem',
@@ -157,7 +180,7 @@ const FraxlendMarketDetail = () => {
                                                     backgroundColor: 'rgba(25, 118, 210, 0.12)'
                                                 }
                                             }}
-                                            onClick={() => setInputValue(marketDetails.assetBalance)} // Replace with actual max value logic
+                                            onClick={() => setInputValue(formatUnits(BigInt(marketDetails.assetBalance), 18))}
                                         >
                                             MAX
                                         </Button>
@@ -172,9 +195,29 @@ const FraxlendMarketDetail = () => {
                             variant="contained"
                             color="primary"
                             fullWidth
-                            onClick={() => console.log('Button clicked with value:', inputValue)}
+                            disabled={isPending || hasAllowance || inputValue === ''}
+                            onClick={() => writeContract({
+                                address: market.asset.address,
+                                abi: Erc20Abi,
+                                functionName: "approve",
+                                args: [market.helperAddress, BigInt(inputValue) * BigInt(10 ** 18)],
+                            })}
                         >
-                            Submit Transaction
+                            {isPending ? 'Processing...' : 'Approve'}
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            disabled={isPending || !hasAllowance || inputValue === ''}
+                            onClick={() => writeContract({
+                                address: market.helperAddress,
+                                abi: FraxlendPairAbi,
+                                functionName: "deposit",
+                                args: [BigInt(inputValue) * BigInt(10 ** 18), userAddress],
+                            })}
+                        >
+                            {isPending ? 'Processing...' : 'Lend'}
                         </Button>
                     </Grid>
                 </Grid>
