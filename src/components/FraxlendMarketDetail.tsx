@@ -155,7 +155,7 @@ const FraxlendMarketDetail = () => {
 
                             <Stack spacing={2}>
                                 <Typography variant="body1">
-                                    <strong>Lending APR:</strong> {market.lendApr.toFixed(2)}%
+                                    <strong>Lending APR:</strong> {market.lendApy.toFixed(2)}%
                                 </Typography>
                                 <Typography variant="body1">
                                     <strong>Utilization:</strong> {market.utilization.toFixed(2)}%

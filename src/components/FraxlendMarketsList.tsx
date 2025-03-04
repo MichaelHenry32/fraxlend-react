@@ -36,7 +36,7 @@ export const FraxlendMarketsList = () => {
                         <TableCell>Name</TableCell>
                         <TableCell>Asset</TableCell>
                         <TableCell>Collateral</TableCell>
-                        <TableCell>Lend APR</TableCell>
+                        <TableCell>Lend APY</TableCell>
                         <TableCell>Total Borrow</TableCell>
                         <TableCell>Utilization</TableCell>
                     </TableRow>
@@ -48,7 +48,7 @@ export const FraxlendMarketsList = () => {
                                 <TableCell>{market.name}</TableCell>
                                 <TableCell>{market.asset.name}</TableCell>
                                 <TableCell>{market.collateral.name}</TableCell>
-                                <TableCell>{market.lendApr}</TableCell>
+                                <TableCell>{market.lendApy}</TableCell>
                                 <TableCell>{market.totalBorrow}</TableCell>
                                 <TableCell>{market.utilization}</TableCell>
                             </TableRow>

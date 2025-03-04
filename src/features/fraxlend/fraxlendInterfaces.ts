@@ -10,7 +10,7 @@ export interface FraxlendMarket {
     name: string,
     asset: ERC20Interface,
     collateral: ERC20Interface,
-    lendApr: number,
+    lendApy: number,
     utilization: number,
     totalBorrow: number,
     isSfrxUsdMarket: boolean
