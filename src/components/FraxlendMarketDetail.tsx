@@ -62,7 +62,7 @@ const FraxlendMarketDetail = () => {
 
     useEffect(() => {
         // Only fetch if we don't have details yet or if the user address has changed
-        if (marketDetails === undefined || marketDetails.user_address !== userAddress || marketDetails.status === 'idle') {
+        if (marketDetails === undefined || marketDetails.userAddress !== userAddress || marketDetails.status === 'idle') {
             dispatch(fetchMarketDetailData({ fraxlendMarket: market, userAddress }));
         }
     }, [dispatch, market, marketDetails, userAddress]);
@@ -206,7 +206,7 @@ const FraxlendMarketDetail = () => {
                                             onClick={() => setDepositAmount(
                                                 tabValue === '0'
                                                     ? formatUnits(BigInt(marketDetails.assetBalance), 18)
-                                                    : formatUnits(BigInt(marketDetails.sharesBalance), 18)
+                                                    : formatUnits(BigInt(marketDetails.depositedBalance), 18)
                                             )}
                                         >
                                             MAX

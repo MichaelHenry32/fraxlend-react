@@ -16,28 +16,28 @@ function get_helper_address(pairAddress: `0x${string}`): `0x${string}` {
     return PAIR_TO_HELPER_MAP[pairAddress] || pairAddress;
 }
 
-export async function getFraxlendMarketDetails(fraxlendMarket: FraxlendMarket, user_address: `0x${string}`): Promise<{ assetBalance: string; sharesBalance: string } | undefined> {
+export async function getFraxlendMarketDetails(fraxlendMarket: FraxlendMarket, userAddress: `0x${string}`): Promise<{ assetBalance: string; depositedBalance: string } | undefined> {
     try {
-        const [assetBalance, sharesBalance] = await publicClient.multicall({
+        const [assetBalance, depositedBalance] = await publicClient.multicall({
             contracts: [
                 {
                     address: fraxlendMarket.asset.address,
                     abi: Erc20Abi,
                     functionName: 'balanceOf',
-                    args: [user_address]
+                    args: [userAddress]
                 },
                 {
-                    address: fraxlendMarket.pairAddress,
-                    abi: Erc20Abi,
-                    functionName: 'balanceOf',
-                    args: [user_address]
+                    address: fraxlendMarket.helperAddress,
+                    abi: FraxlendPairAbi,
+                    functionName: 'maxWithdraw',
+                    args: [userAddress]
                 }
             ]
         });
 
         return {
             assetBalance: assetBalance.result?.toString() || "0",
-            sharesBalance: sharesBalance.result?.toString() || "0"
+            depositedBalance: depositedBalance.result?.toString() || "0"
         };
     } catch (e) {
         console.error("Failed to get fraxlend market details", e)

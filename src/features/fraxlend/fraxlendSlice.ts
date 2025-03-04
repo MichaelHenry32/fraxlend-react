@@ -44,7 +44,7 @@ const fraxlendSlice = createSlice({
             .addCase(fetchMarketDetailData.pending, (state, action) => {
                 const pairAddress = action.meta.arg.fraxlendMarket.pairAddress;
                 if (!state.marketDetails[pairAddress]) {
-                    state.marketDetails[pairAddress] = { user_address: action.meta.arg.userAddress, assetBalance: "0", sharesBalance: "0", status: "loading" };
+                    state.marketDetails[pairAddress] = { userAddress: action.meta.arg.userAddress, assetBalance: "0", depositedBalance: "0", status: "loading" };
                 }
                 state.marketDetails[pairAddress].status = "loading";
             })
@@ -58,7 +58,7 @@ const fraxlendSlice = createSlice({
                 } else {
                     state.marketDetails[pairAddress] = {
                         ...action.payload,
-                        user_address: action.meta.arg.userAddress,
+                        userAddress: action.meta.arg.userAddress,
                         status: "succeeded"
                     }
                 }

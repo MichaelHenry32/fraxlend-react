@@ -17,9 +17,9 @@ export interface FraxlendMarket {
 }
 
 export interface FraxlendMarketDetails {
-    user_address: `0x${string}`,
+    userAddress: `0x${string}`,
     assetBalance: string,
-    sharesBalance: string,
+    depositedBalance: string,
     status: "idle" | "loading" | "succeeded" | "rejected"
 }
 
