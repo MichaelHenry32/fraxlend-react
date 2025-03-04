@@ -9,7 +9,7 @@ import { Erc20Abi } from "../../abis/erc20";
 
 // TODO: Replace this with an automatic fetcher.
 const PAIR_TO_HELPER_MAP: Record<`0x${string}`, `0x${string}`> = {
-    '0x689087338CFbD1D268AD361F7759Fb1200c921e2': '0xd7446c346f54F8F20164e5620CA810b172df2FEa'
+    '0x689087338CFbD1D268AD361F7759Fb1200c921e2': '0x0dA6d7070c41a8d098fA7E5162e5281cD5d0d197'
 }
 
 function get_helper_address(pairAddress: `0x${string}`): `0x${string}` {
