@@ -94,9 +94,9 @@ export async function getFraxlendMarket(pairAddress: `0x${string}`): Promise<Fra
 
         console.log("Got pairAccount and currentRateInfo")
 
-        const utilization = 100 - calculatePercentage(pairAccounting[0], pairAccounting[4]);
+        const utilization = calculatePercentage(pairAccounting[2], pairAccounting[0]);
         // TODO: Use APY instead of APR
-        let lendApr = calculatePercentage(currentRateInfo[3] * BigInt(3153600000), BigInt(10 ** 20));
+        let lendApr = calculatePercentage(currentRateInfo[3] * BigInt(3153600000), BigInt(10 ** 22));
         lendApr = pairAddress != helperAddress ? lendApr : lendApr * utilization / 100
 
         const assetCollateralInfo = await publicClient.multicall({
@@ -142,7 +142,7 @@ export async function getFraxlendMarket(pairAddress: `0x${string}`): Promise<Fra
                 address: collateralAddress.result!
             }, utilization: utilization,
             lendApr: lendApr,
-            totalBorrow: Number(formatUnits(pairAccounting[4] - pairAccounting[0], 18)),
+            totalBorrow: Number(formatUnits(pairAccounting[2], 18)),
             isSfrxUsdMarket: pairAddress != helperAddress
         }
     } catch (e) {
